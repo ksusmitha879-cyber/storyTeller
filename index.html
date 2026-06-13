@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bedtime Storyteller</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0D0B1A; --surface: #16132A; --surface2: #1E1A35;
+      --border: #2A2545; --border-md: #3A3460;
+      --text: #EDE8FF; --muted: #8880B0; --hint: #5A5480;
+      --accent: #7C5CBF; --accent-lt: #1E1535; --accent-dk: #C4A8FF;
+      --gold: #F0C040; --gold-lt: #2A2010;
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+    body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+    .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
+    .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle 3s infinite; }
+    @keyframes twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 0.9; } }
+    .container { max-width: 660px; margin: 0 auto; position: relative; z-index: 1; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header-icon { font-size: 48px; margin-bottom: 0.75rem; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; color: var(--accent-dk); }
+    .subtitle { font-size: 15px; color: var(--muted); font-family: -apple-system, sans-serif; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow); margin-bottom: 1rem; }
+    .section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hint); margin-bottom: 10px; font-family: -apple-system, sans-serif; }
+    .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+    label { font-size: 13px; font-weight: 500; color: var(--muted); display: block; margin-bottom: 5px; font-family: -apple-system, sans-serif; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    input[type="text"], input[type="number"], select {
+      width: 100%; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 14px; color: var(--text);
+      font-family: -apple-system, sans-serif; outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+    input::placeholder { color: var(--hint); }
+    .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .theme-btn { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 13px; color: var(--muted); cursor: pointer; font-family: -apple-system, sans-serif; transition: all 0.15s; text-align: left; }
+    .theme-btn span.icon { font-size: 18px; }
+    .theme-btn.active { background: var(--accent-lt); border-color: var(--accent); color: var(--accent-dk); }
+    .generate-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #5A3A9F); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; letter-spacing: -0.2px; }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    .story-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-top: 1rem; animation: fadeUp 0.3s ease; box-shadow: var(--shadow); }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .story-header { padding: 14px 20px; background: linear-gradient(135deg, var(--accent-lt), var(--gold-lt)); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .story-meta { font-size: 13px; color: var(--muted); font-family: -apple-system, sans-serif; display: flex; align-items: center; gap: 8px; }
+    .story-meta i { color: var(--gold); font-size: 16px; }
+    .copy-btn { display: flex; align-items: center; gap: 5px; padding: 6px 11px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--muted); cursor: pointer; font-family: -apple-system, sans-serif; transition: all 0.15s; }
+    .copy-btn:hover { background: var(--surface2); }
+    .story-body { padding: 2rem; }
+    .story-text { font-size: 16px; line-height: 2; color: var(--text); white-space: pre-wrap; font-style: italic; }
+    .story-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: center; }
+    .regen-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--accent-lt); border: 1px solid var(--accent); border-radius: 99px; font-size: 13px; color: var(--accent-dk); cursor: pointer; font-family: -apple-system, sans-serif; transition: all 0.15s; }
+    .regen-btn:hover { background: var(--accent); color: #fff; }
+    .error-box { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: #2A1010; border: 1px solid #8B3030; border-radius: var(--radius-md); font-size: 13px; color: #F09090; margin-top: 1rem; font-family: -apple-system, sans-serif; }
+    select option { background: var(--surface2); }
+    @media (max-width: 500px) { .field-grid { grid-template-columns: 1fr; } .field.full { grid-column: 1; } .theme-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-icon">🌙</div>
+    <h1>Bedtime Storyteller</h1>
+    <p class="subtitle">Magical, personalized stories crafted just for your little one.</p>
+  </div>
+
+  <div class="card">
+    <p class="section-title">About the child</p>
+    <div class="field-grid">
+      <div class="field">
+        <label>Child's name</label>
+        <input type="text" id="childName" placeholder="e.g. Leo" />
+      </div>
+      <div class="field">
+        <label>Age</label>
+        <input type="number" id="childAge" placeholder="e.g. 5" min="2" max="12" />
+      </div>
+      <div class="field full">
+        <label>Favourite character or animal</label>
+        <input type="text" id="character" placeholder="e.g. A clumsy astronaut, a tiny dragon, a talking cat" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <p class="section-title">Story theme / moral lesson</p>
+    <div class="theme-grid" id="themeGrid">
+      <button class="theme-btn active" data-val="It's okay to make mistakes and try again">
+        <span class="icon">💫</span> It's okay to make mistakes
+      </button>
+      <button class="theme-btn" data-val="Kindness and helping others always matters">
+        <span class="icon">💛</span> Kindness to others
+      </button>
+      <button class="theme-btn" data-val="Bravery means doing something even when you're scared">
+        <span class="icon">🦁</span> Being brave
+      </button>
+      <button class="theme-btn" data-val="Friendship and teamwork make anything possible">
+        <span class="icon">🤝</span> Friendship & teamwork
+      </button>
+      <button class="theme-btn" data-val="It's important to be patient and wait for good things">
+        <span class="icon">🌱</span> Patience pays off
+      </button>
+      <button class="theme-btn" data-val="Believing in yourself can move mountains">
+        <span class="icon">⭐</span> Believe in yourself
+      </button>
+    </div>
+
+    <div class="divider"></div>
+    <p class="section-title">Story length</p>
+    <div class="field-grid">
+      <div class="field full">
+        <select id="storyLength">
+          <option value="short (about 150 words)">Short — Quick read (150 words)</option>
+          <option value="medium (about 300 words)" selected>Medium — Just right (300 words)</option>
+          <option value="long (about 500 words)">Long — Full adventure (500 words)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="generate-btn" id="genBtn" onclick="generate()">
+    🌙 &nbsp;Tell me a story
+  </button>
+
+  <div id="errorBox" style="display:none"></div>
+
+  <div id="storyCard" class="story-card" style="display:none">
+    <div class="story-header">
+      <div class="story-meta"><i class="ti ti-stars"></i> Your bedtime story</div>
+      <button class="copy-btn" onclick="copyStory()"><i class="ti ti-copy" style="font-size:14px"></i> Copy</button>
+    </div>
+    <div class="story-body">
+      <div class="story-text" id="storyText"></div>
+    </div>
+    <div class="story-footer">
+      <button class="regen-btn" onclick="generate()"><i class="ti ti-refresh" style="font-size:14px"></i> Tell another story</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Generate twinkling stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 3 + 1;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;
+    starsEl.appendChild(s);
+  }
+
+  let selectedTheme = "It's okay to make mistakes and try again";
+
+  document.getElementById('themeGrid').addEventListener('click', e => {
+    const btn = e.target.closest('.theme-btn');
+    if (!btn) return;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTheme = btn.dataset.val;
+  });
+
+  async function generate() {
+    const name = document.getElementById('childName').value.trim();
+    const age = document.getElementById('childAge').value.trim();
+    const character = document.getElementById('character').value.trim();
+    const length = document.getElementById('storyLength').value;
+
+    if (!name || !age) { showError('Please enter the child\'s name and age.'); return; }
+    if (!character) { showError('Please enter a favourite character or animal.'); return; }
+
+    setLoading(true);
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('storyCard').style.display = 'none';
+
+    const prompt = `Write a soothing bedtime story for a ${age}-year-old named ${name}. The protagonist is ${character}. The moral of the story is: "${selectedTheme}".
+
+Requirements:
+- Use simple vocabulary appropriate for age ${age}
+- Include warm sensory details (soft, cozy, dreamy)
+- End with a calm, sleepy conclusion that helps the child feel safe and ready to sleep
+- Length: ${length}
+- Use a gentle, flowing narrative style
+- Include the child's name (${name}) naturally in the story
+- Make it feel magical and imaginative
+
+Write only the story — no title on a separate line, embed the title naturally in the first sentence.`;
+
+    try {
+      const res = await fetch('/.netlify/functions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1200,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      const story = data.content.map(b => b.text || '').join('').trim();
+      document.getElementById('storyText').textContent = story;
+      document.getElementById('storyCard').style.display = 'block';
+      document.getElementById('storyCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+      showError('Could not generate story: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('genBtn');
+    btn.disabled = on;
+    btn.innerHTML = on ? '<span class="spinner"></span> Weaving your story…' : '🌙 &nbsp;Tell me a story';
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.className = 'error-box';
+    box.style.display = 'flex';
+    box.innerHTML = `<i class="ti ti-alert-circle" style="font-size:16px;flex-shrink:0"></i><span>${msg}</span>`;
+  }
+
+  function copyStory() {
+    navigator.clipboard.writeText(document.getElementById('storyText').textContent).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.innerHTML = '<i class="ti ti-check" style="font-size:14px"></i> Copied!';
+      setTimeout(() => { btn.innerHTML = '<i class="ti ti-copy" style="font-size:14px"></i> Copy'; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
