@@ -14,6 +14,7 @@ A heartwarming AI application that generates unique, age-appropriate bedtime sto
 > **Output:** A gentle, rhyming tale about Captain Leo dropping his moon-map, getting lost, but discovering a beautiful new galaxy because of his mistake — ending with a soft, sleepy conclusion.
 
 ---
+## Deployed link - https://poetic-dango-6a931f.netlify.app
 
 ## Features
 
